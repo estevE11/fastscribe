@@ -1,10 +1,12 @@
 """FastScribe backend: FastAPI + faster-whisper local transcription server."""
 
+import json
 import os
 import tempfile
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from faster_whisper import WhisperModel
 
 ALLOWED_EXTENSIONS = {".mp3", ".wav", ".m4a", ".opus"}
@@ -60,37 +62,56 @@ async def transcribe(
             detail=f"Unsupported file type '{ext}'. Allowed: {sorted(ALLOWED_EXTENSIONS)}",
         )
 
-    tmp_path = None
-    try:
-        # Persist the upload to a temp file so faster-whisper can read from disk.
-        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
-            tmp_path = tmp.name
-            content = await file.read()
-            tmp.write(content)
+    # Read the upload while we're still in the async request context.
+    content = await file.read()
 
-        segments, info = model.transcribe(
-            tmp_path,
-            language=lang_arg,
-            beam_size=5,
-            # VAD strips silent regions that make Whisper hallucinate
-            # phantom phrases (e.g. "감사합니다", "Thank you").
-            vad_filter=True,
-        )
-        transcript = " ".join(segment.text.strip() for segment in segments).strip()
+    def stream():
+        """Yield newline-delimited JSON progress events as segments decode."""
+        tmp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
+                tmp_path = tmp.name
+                tmp.write(content)
 
-        return {
-            "filename": filename,
-            "transcript": transcript,
-            "language": info.language,
-        }
-    except HTTPException:
-        raise
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Transcription failed: {exc}")
-    finally:
-        # Always clean up the temporary audio file.
-        if tmp_path and os.path.exists(tmp_path):
-            os.remove(tmp_path)
+            segments, info = model.transcribe(
+                tmp_path,
+                language=lang_arg,
+                beam_size=5,
+                # VAD strips silent regions that make Whisper hallucinate
+                # phantom phrases (e.g. "감사합니다", "Thank you").
+                vad_filter=True,
+            )
+
+            # info.duration is the audio length; each segment.end is its position
+            # on that timeline, so end / duration is real progress.
+            duration = info.duration or 0
+            parts = []
+            for segment in segments:
+                parts.append(segment.text.strip())
+                progress = min(segment.end / duration, 0.999) if duration else 0.0
+                yield json.dumps({
+                    "type": "progress",
+                    "progress": progress,
+                    "text": " ".join(parts).strip(),
+                }) + "\n"
+
+            yield json.dumps({
+                "type": "done",
+                "progress": 1.0,
+                "filename": filename,
+                "transcript": " ".join(parts).strip(),
+                "language": info.language,
+            }) + "\n"
+        except Exception as exc:
+            yield json.dumps({
+                "type": "error",
+                "detail": f"Transcription failed: {exc}",
+            }) + "\n"
+        finally:
+            if tmp_path and os.path.exists(tmp_path):
+                os.remove(tmp_path)
+
+    return StreamingResponse(stream(), media_type="application/x-ndjson")
 
 
 if __name__ == "__main__":
