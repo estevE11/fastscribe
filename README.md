@@ -1,0 +1,82 @@
+# FastScribe
+
+Minimal, local audio transcription desktop app. Electron UI + a Python
+[`faster-whisper`](https://github.com/SYSTRAN/faster-whisper) backend. Audio
+never leaves your machine — transcription runs fully offline after the model is
+downloaded once.
+
+## Features
+
+- Drag-and-drop or file-picker for `.mp3`, `.wav`, `.m4a`, `.opus`
+- Language selector (auto-detect or force a specific language)
+- Voice-activity filtering to suppress silence hallucinations
+- In-memory list of transcriptions with filename, timestamp, detected language
+- Dark, minimal UI
+- Python backend auto-spawned and cleanly terminated by Electron
+
+## Architecture
+
+```
+fastcribe/
+├── main.js                 Electron main: spawns/kills backend, opens window
+├── preload.js              contextBridge — exposes backend URL only
+├── renderer/               UI (dark theme, dropzone, language selector)
+│   ├── index.html
+│   ├── styles.css
+│   └── renderer.js
+├── python_backend/
+│   ├── main.py             FastAPI + faster-whisper (WhisperModel "small")
+│   └── requirements.txt
+└── package.json
+```
+
+- **Backend:** FastAPI on `http://127.0.0.1:8000`, `POST /transcribe`
+  (multipart file + optional `language`) → `{ filename, transcript, language }`.
+- **Lifecycle:** `main.js` spawns the backend on launch (preferring the project
+  virtualenv interpreter) and kills it on quit.
+
+## Prerequisites
+
+- Node.js 18+
+- Python 3.9+
+- macOS / Windows / Linux
+
+## Setup
+
+### 1. Python backend
+
+```bash
+cd python_backend
+python3 -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+deactivate
+```
+
+The first transcription downloads the Whisper `small` model (~460 MB) and caches
+it; subsequent runs are fast.
+
+### 2. Electron app
+
+```bash
+npm install
+npm start
+```
+
+`npm start` auto-spawns the backend and opens the window once it's healthy.
+
+## Usage
+
+1. Pick a language (or leave **Auto-detect**).
+2. Drop an audio file onto the dropzone, or click **Choose file**.
+3. The transcription appears at the top of the list.
+
+## Configuration
+
+- **Model size** — edit `WhisperModel("small")` in `python_backend/main.py`.
+  Larger models (`medium`, `large-v3`) are more accurate but slower.
+- **Port** — backend runs on `127.0.0.1:8000` (see `main.py` and `preload.js`).
+
+## License
+
+MIT

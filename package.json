@@ -1,0 +1,14 @@
+{
+  "name": "fastscribe",
+  "version": "1.0.0",
+  "description": "Local audio transcription desktop app powered by faster-whisper",
+  "main": "main.js",
+  "scripts": {
+    "start": "unset ELECTRON_RUN_AS_NODE; electron ."
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.7.7"
+  }
+}

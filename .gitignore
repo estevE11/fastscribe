@@ -1,0 +1,33 @@
+# Node / Electron
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+out/
+.electron/
+
+# Python
+python_backend/venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# faster-whisper / HF model cache (large, downloaded at runtime)
+models/
+*.bin
+
+# Logs & temp
+*.log
+tmp/
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
