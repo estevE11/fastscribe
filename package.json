@@ -3,12 +3,44 @@
   "version": "1.0.0",
   "description": "Local audio transcription desktop app powered by faster-whisper",
   "main": "main.js",
-  "scripts": {
-    "start": "unset ELECTRON_RUN_AS_NODE; electron ."
-  },
-  "author": "",
+  "author": "estevE11",
   "license": "MIT",
+  "scripts": {
+    "start": "unset ELECTRON_RUN_AS_NODE; electron .",
+    "dist": "electron-builder"
+  },
   "devDependencies": {
-    "electron": "^31.7.7"
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.esteve11.fastscribe",
+    "productName": "FastScribe",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "python_backend/dist/fastscribe-backend",
+        "to": "backend"
+      }
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.productivity",
+      "identity": null
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "AudioVideo"
+    }
   }
 }

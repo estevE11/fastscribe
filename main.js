@@ -23,12 +23,33 @@ function resolvePython() {
   }
 }
 
-function startBackend() {
-  const python = resolvePython();
-  const script = path.join(__dirname, 'python_backend', 'main.py');
+// Path to the PyInstaller-frozen backend bundled in packaged builds.
+function bundledBackend() {
+  const exe = process.platform === 'win32'
+    ? 'fastscribe-backend.exe'
+    : 'fastscribe-backend';
+  return path.join(process.resourcesPath, 'backend', exe);
+}
 
-  pyProc = spawn(python, [script], {
-    cwd: path.join(__dirname, 'python_backend'),
+function startBackend() {
+  // Packaged builds ship a frozen backend binary (no Python required).
+  // In development we run the source with the venv/system interpreter.
+  let command;
+  let args;
+  let cwd;
+
+  if (app.isPackaged) {
+    command = bundledBackend();
+    args = [];
+    cwd = path.dirname(command);
+  } else {
+    command = resolvePython();
+    args = [path.join(__dirname, 'python_backend', 'main.py')];
+    cwd = path.join(__dirname, 'python_backend');
+  }
+
+  pyProc = spawn(command, args, {
+    cwd,
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 

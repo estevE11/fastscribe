@@ -7,6 +7,12 @@ dist/
 out/
 .electron/
 
+# Build output
+release/
+python_backend/build/
+python_backend/dist/
+*.spec
+
 # Python
 python_backend/venv/
 __pycache__/

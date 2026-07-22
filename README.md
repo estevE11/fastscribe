@@ -5,6 +5,16 @@ Minimal, local audio transcription desktop app. Electron UI + a Python
 never leaves your machine — transcription runs fully offline after the model is
 downloaded once.
 
+## Download
+
+Prebuilt installers for macOS (`.dmg`), Windows (`.exe`), and Linux
+(`.AppImage`) are attached to each [release](https://github.com/estevE11/fastscribe/releases).
+They bundle the Python backend — no Python install required.
+
+> **macOS:** builds are unsigned. On first launch Gatekeeper may block the app;
+> allow it under *System Settings → Privacy & Security*, or run
+> `xattr -cr /Applications/FastScribe.app`.
+
 ## Features
 
 - Drag-and-drop or file-picker for `.mp3`, `.wav`, `.m4a`, `.opus`
