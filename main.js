@@ -7,6 +7,10 @@ let mainWindow = null;
 let pyProc = null;
 
 const BACKEND_URL = 'http://127.0.0.1:8000';
+const APP_ICON = path.join(__dirname, 'icon.png');
+
+// Show "FastScribe" instead of "Electron" in menus, dock, and userData path.
+app.setName('FastScribe');
 
 function resolvePython() {
   // Prefer the project virtualenv interpreter, fall back to system python.
@@ -97,6 +101,8 @@ function createWindow() {
     height: 720,
     minWidth: 640,
     minHeight: 480,
+    title: 'FastScribe',
+    icon: APP_ICON,
     backgroundColor: '#111318',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -113,6 +119,13 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
+  // macOS shows the dock icon from the bundle; set it explicitly in dev.
+  if (process.platform === 'darwin' && app.dock) {
+    try {
+      app.dock.setIcon(APP_ICON);
+    } catch (_) {}
+  }
+
   startBackend();
   await waitForBackend();
   createWindow();
