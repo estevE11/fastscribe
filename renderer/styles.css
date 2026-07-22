@@ -24,7 +24,15 @@ body {
 }
 
 .app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 24px;
+}
+
+.app-title {
+  min-width: 0;
 }
 
 .app-header h1 {
@@ -39,64 +47,69 @@ body {
   font-size: 14px;
 }
 
-.controls {
+.header-controls {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 16px;
-  font-size: 13px;
-  color: var(--muted);
+  flex-shrink: 0;
 }
 
-.controls select {
+.header-controls select {
   background: var(--panel-2);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 7px 12px;
+  padding: 9px 12px;
   font-size: 13px;
   cursor: pointer;
 }
 
-.controls select:focus {
+.header-controls select:focus {
   outline: none;
   border-color: var(--accent);
 }
 
-.dropzone {
-  border: 2px dashed var(--border);
-  border-radius: 14px;
-  background: var(--panel);
-  padding: 36px;
+/* Full-window drag-and-drop overlay */
+.drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 19, 24, 0.82);
+  backdrop-filter: blur(2px);
+}
+
+.drop-overlay.visible {
+  display: flex;
+}
+
+.drop-overlay-inner {
+  border: 2px dashed var(--accent);
+  border-radius: 16px;
+  padding: 48px 72px;
   text-align: center;
-  transition: border-color 0.15s, background 0.15s;
+  color: var(--text);
+  background: var(--panel);
+  pointer-events: none;
 }
 
-.dropzone.dragover {
-  border-color: var(--accent);
-  background: var(--panel-2);
+.drop-overlay-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
 }
 
-.dropzone-icon {
-  font-size: 34px;
-}
-
-.dropzone-title {
-  margin: 10px 0 2px;
+.drop-overlay-inner p {
+  margin: 4px 0;
   font-size: 17px;
   font-weight: 600;
 }
 
-.dropzone-hint {
-  margin: 6px 0;
+.drop-overlay-formats {
   color: var(--muted);
-  font-size: 13px;
-}
-
-.dropzone-formats {
-  margin: 14px 0 0;
-  color: var(--muted);
-  font-size: 12px;
+  font-size: 12px !important;
+  font-weight: 400 !important;
   letter-spacing: 0.04em;
 }
 

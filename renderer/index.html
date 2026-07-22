@@ -12,14 +12,12 @@
   </head>
   <body>
     <header class="app-header">
-      <h1>FastScribe</h1>
-      <p class="subtitle">Local audio transcription · faster-whisper</p>
-    </header>
-
-    <main>
-      <div class="controls">
-        <label for="langSelect">Language</label>
-        <select id="langSelect">
+      <div class="app-title">
+        <h1>FastScribe</h1>
+        <p class="subtitle">Local audio transcription · faster-whisper</p>
+      </div>
+      <div class="header-controls">
+        <select id="langSelect" title="Transcription language">
           <option value="auto">Auto-detect</option>
           <option value="es" selected>Spanish</option>
           <option value="en">English</option>
@@ -34,24 +32,17 @@
           <option value="zh">Chinese</option>
           <option value="ko">Korean</option>
         </select>
-      </div>
-
-      <section id="dropzone" class="dropzone">
-        <div class="dropzone-inner">
-          <div class="dropzone-icon">🎙️</div>
-          <p class="dropzone-title">Drop audio here</p>
-          <p class="dropzone-hint">or</p>
-          <button id="selectBtn" class="btn">Choose file</button>
-          <p class="dropzone-formats">.mp3 · .wav · .m4a · .opus</p>
-        </div>
+        <button id="selectBtn" class="btn">Choose file</button>
         <input
           id="fileInput"
           type="file"
           accept=".mp3,.wav,.m4a,.opus,audio/mpeg,audio/wav,audio/x-m4a,audio/opus,audio/ogg"
           hidden
         />
-      </section>
+      </div>
+    </header>
 
+    <main>
       <section id="status" class="status hidden">
         <div class="status-row">
           <div class="spinner"></div>
@@ -69,6 +60,14 @@
         <ul id="list" class="list"></ul>
       </section>
     </main>
+
+    <div id="dropOverlay" class="drop-overlay">
+      <div class="drop-overlay-inner">
+        <div class="drop-overlay-icon">🎙️</div>
+        <p>Drop audio to transcribe</p>
+        <p class="drop-overlay-formats">.mp3 · .wav · .m4a · .opus</p>
+      </div>
+    </div>
 
     <script src="renderer.js"></script>
   </body>

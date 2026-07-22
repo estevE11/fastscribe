@@ -1,7 +1,7 @@
 const BACKEND_URL = window.fastscribe.backendUrl;
 const ALLOWED = [".mp3", ".wav", ".m4a", ".opus"];
 
-const dropzone = document.getElementById("dropzone");
+const dropOverlay = document.getElementById("dropOverlay");
 const fileInput = document.getElementById("fileInput");
 const selectBtn = document.getElementById("selectBtn");
 const langSelect = document.getElementById("langSelect");
@@ -271,21 +271,35 @@ fileInput.addEventListener("change", () => {
   fileInput.value = "";
 });
 
-["dragenter", "dragover"].forEach((evt) =>
-  dropzone.addEventListener(evt, (e) => {
-    e.preventDefault();
-    dropzone.classList.add("dragover");
-  })
-);
+// Whole-window drag-and-drop. A counter tracks nested enter/leave events
+// fired by child elements so the overlay doesn't flicker.
+let dragDepth = 0;
 
-["dragleave", "drop"].forEach((evt) =>
-  dropzone.addEventListener(evt, (e) => {
-    e.preventDefault();
-    dropzone.classList.remove("dragover");
-  })
-);
+function isFileDrag(e) {
+  return e.dataTransfer && Array.from(e.dataTransfer.types).includes("Files");
+}
 
-dropzone.addEventListener("drop", (e) => {
+window.addEventListener("dragenter", (e) => {
+  if (!isFileDrag(e)) return;
+  e.preventDefault();
+  dragDepth++;
+  dropOverlay.classList.add("visible");
+});
+
+window.addEventListener("dragover", (e) => {
+  if (isFileDrag(e)) e.preventDefault();
+});
+
+window.addEventListener("dragleave", (e) => {
+  if (!isFileDrag(e)) return;
+  dragDepth = Math.max(0, dragDepth - 1);
+  if (dragDepth === 0) dropOverlay.classList.remove("visible");
+});
+
+window.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dragDepth = 0;
+  dropOverlay.classList.remove("visible");
   const files = e.dataTransfer.files;
   if (files && files.length) transcribe(files[0]);
 });
