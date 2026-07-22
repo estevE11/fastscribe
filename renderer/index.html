@@ -11,38 +11,14 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="topbar">
     <header class="app-header">
       <div class="app-title">
         <h1>FastScribe</h1>
         <p class="subtitle">Local audio transcription</p>
       </div>
-      <div class="header-controls">
-        <select id="langSelect" title="Transcription language">
-          <option value="auto">Auto-detect</option>
-          <option value="es" selected>Spanish</option>
-          <option value="en">English</option>
-          <option value="fr">French</option>
-          <option value="de">German</option>
-          <option value="it">Italian</option>
-          <option value="pt">Portuguese</option>
-          <option value="ca">Catalan</option>
-          <option value="nl">Dutch</option>
-          <option value="ru">Russian</option>
-          <option value="ja">Japanese</option>
-          <option value="zh">Chinese</option>
-          <option value="ko">Korean</option>
-        </select>
-        <button id="selectBtn" class="btn">Choose file</button>
-        <input
-          id="fileInput"
-          type="file"
-          accept=".mp3,.wav,.m4a,.opus,audio/mpeg,audio/wav,audio/x-m4a,audio/opus,audio/ogg"
-          hidden
-        />
-      </div>
     </header>
 
-    <main>
       <section id="status" class="status hidden">
         <div class="status-row">
           <div class="spinner"></div>
@@ -54,11 +30,38 @@
         </div>
       </section>
 
-      <section class="list-section">
-        <h2>Transcriptions</h2>
-        <div id="empty" class="empty">No transcriptions yet.</div>
-        <ul id="list" class="list"></ul>
-      </section>
+      <div class="list-heading-row">
+        <h2 class="list-heading">Transcriptions</h2>
+        <div class="header-controls">
+          <select id="langSelect" title="Transcription language">
+            <option value="auto">Auto-detect</option>
+            <option value="es" selected>Spanish</option>
+            <option value="en">English</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="ca">Catalan</option>
+            <option value="nl">Dutch</option>
+            <option value="ru">Russian</option>
+            <option value="ja">Japanese</option>
+            <option value="zh">Chinese</option>
+            <option value="ko">Korean</option>
+          </select>
+          <button id="selectBtn" class="btn">New transcription +</button>
+          <input
+            id="fileInput"
+            type="file"
+            accept=".mp3,.wav,.m4a,.opus,audio/mpeg,audio/wav,audio/x-m4a,audio/opus,audio/ogg"
+            hidden
+          />
+        </div>
+      </div>
+    </div>
+
+    <main class="list-section">
+      <div id="empty" class="empty">No transcriptions yet.</div>
+      <ul id="list" class="list"></ul>
     </main>
 
     <div id="dropOverlay" class="drop-overlay">
