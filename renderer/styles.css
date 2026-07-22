@@ -134,6 +134,62 @@ body {
   cursor: not-allowed;
 }
 
+.btn-ghost {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  background: var(--border);
+}
+
+.btn-danger {
+  background: #c0392b;
+}
+
+.btn-danger:hover {
+  background: #a93226;
+}
+
+/* Confirmation modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 19, 24, 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.modal-overlay.visible {
+  display: flex;
+}
+
+.modal {
+  width: min(90vw, 380px);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.modal-message {
+  margin: 0 0 20px;
+  font-size: 15px;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .status {
   display: flex;
   flex-direction: column;

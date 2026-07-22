@@ -12,6 +12,10 @@ const progressWrap = document.querySelector(".progress");
 const progressBar = document.getElementById("progressBar");
 const list = document.getElementById("list");
 const emptyEl = document.getElementById("empty");
+const confirmModal = document.getElementById("confirmModal");
+const confirmMessage = document.getElementById("confirmMessage");
+const confirmOk = document.getElementById("confirmOk");
+const confirmCancel = document.getElementById("confirmCancel");
 
 const STORE_KEY = "fastscribe.transcriptions";
 
@@ -45,6 +49,38 @@ function updateEmpty() {
 function hasAllowedExt(name) {
   const lower = name.toLowerCase();
   return ALLOWED.some((ext) => lower.endsWith(ext));
+}
+
+// Themed confirmation modal. Resolves true (confirm) or false (cancel/dismiss).
+function confirmDialog(message) {
+  return new Promise((resolve) => {
+    confirmMessage.textContent = message;
+    confirmModal.classList.add("visible");
+    confirmOk.focus();
+
+    const close = (result) => {
+      confirmModal.classList.remove("visible");
+      confirmOk.removeEventListener("click", onOk);
+      confirmCancel.removeEventListener("click", onCancel);
+      confirmModal.removeEventListener("click", onBackdrop);
+      document.removeEventListener("keydown", onKey);
+      resolve(result);
+    };
+    const onOk = () => close(true);
+    const onCancel = () => close(false);
+    const onBackdrop = (e) => {
+      if (e.target === confirmModal) close(false);
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") close(false);
+      else if (e.key === "Enter") close(true);
+    };
+
+    confirmOk.addEventListener("click", onOk);
+    confirmCancel.addEventListener("click", onCancel);
+    confirmModal.addEventListener("click", onBackdrop);
+    document.addEventListener("keydown", onKey);
+  });
 }
 
 function setBusy(on, text) {
@@ -118,8 +154,10 @@ function renderCard(item, { expanded = false, persist = true } = {}) {
   del.className = "card-delete";
   del.textContent = "×";
   del.title = "Delete";
-  del.addEventListener("click", (e) => {
+  del.addEventListener("click", async (e) => {
     e.stopPropagation();
+    const ok = await confirmDialog(`Delete "${item.title || "this transcription"}"?`);
+    if (!ok) return;
     if (persist) {
       const i = items.findIndex((x) => x.id === item.id);
       if (i !== -1) items.splice(i, 1);
