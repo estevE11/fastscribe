@@ -16,8 +16,17 @@ const confirmModal = document.getElementById("confirmModal");
 const confirmMessage = document.getElementById("confirmMessage");
 const confirmOk = document.getElementById("confirmOk");
 const confirmCancel = document.getElementById("confirmCancel");
+const toast = document.getElementById("toast");
 
 const STORE_KEY = "fastscribe.transcriptions";
+
+// Inline SVG icons (inherit color via currentColor).
+const ICON_CHEVRON =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>';
+const ICON_COPY =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const ICON_TRASH =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
 
 let busy = false;
 // Persisted transcriptions, newest first.
@@ -49,6 +58,36 @@ function updateEmpty() {
 function hasAllowedExt(name) {
   const lower = name.toLowerCase();
   return ALLOWED.some((ext) => lower.endsWith(ext));
+}
+
+// Copy text to the clipboard, with a legacy fallback if the async API fails.
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (_) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+}
+
+let toastTimer = null;
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add("visible");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("visible"), 2400);
 }
 
 // Themed confirmation modal. Resolves true (confirm) or false (cancel/dismiss).
@@ -126,7 +165,7 @@ function renderCard(item, { expanded = false, persist = true } = {}) {
 
   const chevron = document.createElement("span");
   chevron.className = "card-chevron";
-  chevron.textContent = "▸";
+  chevron.innerHTML = ICON_CHEVRON;
 
   // Editable title.
   const title = document.createElement("input");
@@ -150,9 +189,19 @@ function renderCard(item, { expanded = false, persist = true } = {}) {
     ? `${item.language.toUpperCase()} · ${formatDate(when)}`
     : formatDate(when);
 
+  const copy = document.createElement("button");
+  copy.className = "card-copy";
+  copy.innerHTML = ICON_COPY;
+  copy.title = "Copy transcript";
+  copy.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    await copyText(item.transcript);
+    showToast(`Copied “${item.title || "transcription"}” to clipboard`);
+  });
+
   const del = document.createElement("button");
   del.className = "card-delete";
-  del.textContent = "×";
+  del.innerHTML = ICON_TRASH;
   del.title = "Delete";
   del.addEventListener("click", async (e) => {
     e.stopPropagation();
@@ -170,6 +219,7 @@ function renderCard(item, { expanded = false, persist = true } = {}) {
   head.appendChild(chevron);
   head.appendChild(title);
   head.appendChild(meta);
+  head.appendChild(copy);
   head.appendChild(del);
 
   const text = document.createElement("p");

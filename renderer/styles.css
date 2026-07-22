@@ -308,11 +308,18 @@ body {
 }
 
 .card-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--muted);
-  font-size: 12px;
   flex-shrink: 0;
   transition: transform 0.15s;
   transform: rotate(90deg);
+}
+
+.card-chevron svg {
+  width: 20px;
+  height: 20px;
 }
 
 .card.collapsed .card-chevron {
@@ -351,17 +358,35 @@ body {
   flex-shrink: 0;
 }
 
+.card-copy {
+  margin-left: 8px;
+}
+
+.card-copy,
 .card-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   background: transparent;
   border: none;
   color: var(--muted);
-  font-size: 18px;
   line-height: 1;
-  padding: 2px 6px;
+  padding: 5px;
   border-radius: 6px;
   cursor: pointer;
   transition: color 0.15s, background 0.15s;
+}
+
+.card-copy svg,
+.card-delete svg {
+  width: 17px;
+  height: 17px;
+}
+
+.card-copy:hover {
+  color: var(--accent);
+  background: var(--panel-2);
 }
 
 .card-delete:hover {
@@ -390,4 +415,29 @@ body {
 
 .hidden {
   display: none;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translate(-50%, 20px);
+  z-index: 300;
+  max-width: 80vw;
+  padding: 12px 18px;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
