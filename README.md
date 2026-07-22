@@ -11,9 +11,27 @@ Prebuilt installers for macOS (`.dmg`), Windows (`.exe`), and Linux
 (`.AppImage`) are attached to each [release](https://github.com/estevE11/fastscribe/releases).
 They bundle the Python backend — no Python install required.
 
-> **macOS:** builds are unsigned. On first launch Gatekeeper may block the app;
-> allow it under *System Settings → Privacy & Security*, or run
-> `xattr -cr /Applications/FastScribe.app`.
+### macOS: "FastScribe is damaged / malware" on first launch
+
+The builds are **not signed or notarized** (that requires a paid Apple Developer
+account). Because the app bundles a Python backend, macOS Gatekeeper may quarantine
+it and — on recent macOS versions — even move it to the Bin, reporting it as
+malware. This is a **false positive** from the unsigned bundle, not actual malware.
+
+To run it, strip the quarantine flag **before** first launch:
+
+```bash
+# 1. Open the .dmg and drag FastScribe to Applications, then:
+xattr -cr /Applications/FastScribe.app
+# 2. Open it normally.
+```
+
+If macOS already moved it to the Bin, restore it to Applications first, then run
+the command above. Alternatively, after a blocked launch, allow it under
+*System Settings → Privacy & Security → Open Anyway*.
+
+> Prefer to build it yourself and avoid this entirely? See
+> [Setup](#setup) — locally built apps are not quarantined.
 
 ## Features
 

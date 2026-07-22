@@ -71,6 +71,18 @@ jobs:
           tag_name: ${{ github.ref_name }}
           generate_release_notes: true
           fail_on_unmatched_files: false
+          body: |
+            ### macOS install note
+
+            Builds are unsigned. macOS may quarantine the app (or move it to the
+            Bin as "malware" — a false positive from the unsigned bundle). After
+            dragging **FastScribe** to Applications, run:
+
+            ```bash
+            xattr -cr /Applications/FastScribe.app
+            ```
+
+            then open it normally.
           files: |
             release/*.dmg
             release/*.exe
